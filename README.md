@@ -12,3 +12,5 @@ This container provides a way to get the ECR creds via aws-cli and then login vi
 Now your flux pod should be up and running and checking ECR images running inside your cluster!
 
 If you see an error message about "--docker-config" then something isn't configured right. Debug by running `kubectl exec -it <pod_name> -c flux /bin/sh` and running `cat /docker-creds/config.json` and inspecting the docker config using `base64` to look for reasons why.
+
+The Dockerfile is provided for convenience but the one already used in the manifest should work fine.
