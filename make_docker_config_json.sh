@@ -28,9 +28,13 @@ EOF
 # All .dockercfg files must be "Kubernetes" style, i.e. they do not have a
 # "auths" container object, they just have the single repository auth config.
 cp /tmp/ecr_creds /tmp/combined_creds
-shopt -s nullglob  # Ensure that if no secrets are mounted that we do nothing
 for secret_dir in /docker-secrets/*/; do
+  # Skip case for no mounts
+  if [ "$secret_dir" = "/docker-secrets/*/" ]; then echo "No docker secrets mounted"; break; fi
+
   jq -Ms '.[0].auths * .[1] | {auths: .}' /tmp/combined_creds $secret_dir/.dockercfg > /tmp/combined_creds_new
   mv /tmp/combined_creds_new /tmp/combined_creds
 done
+
 cp /tmp/combined_creds /docker-creds/${DOCKER_CREDS_FILE_NAME}
+echo "Wrote docker auth config to /docker-creds/${DOCKER_CREDS_FILE_NAME}"
