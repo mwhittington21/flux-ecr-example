@@ -2,7 +2,7 @@
 
 This container provides a way to get the ECR creds via aws-cli and then login via Docker and write the Docker .config file to disk somewhere.
 
-## Usage
+## Basic usage
 
 1. Replace "ap-southeast-2" in `flux-deployment.yaml` with the name of the AWS region that your registry is in
 1. Edit the "--git-url" in `flux-deployment.yaml` to point to your git repository
@@ -15,6 +15,8 @@ If you see an error message about "--docker-config" then something isn't configu
 
 The Dockerfile is provided for convenience but the one already used in the manifest should work fine.
 
-## Limitations
+## Multiple docker registry support
 
-Right now this will only allow you to auth to an ECR registry. You would need to edit the script to accept mounted in secrets and possibly use `jq` to stitch them all together if you wanted flux to auth to multiple different registries at once. This is just a proof of concept.
+You can also get support for ECR in combination with other docker registries. To do this, edit the `flux-with-secrets-deployment.yaml` file as you would for the basic usage, change the references to `example-docker-pull-secret` to instead point to a secret in the namespace flux is running in. The secret should be of type `kubernetes.io/dockercfg`. Anything created for use with a serviceAccount will work.
+
+Apply the `flux-with-secrets-deployment.yaml` manifest and it will use jq to combine all of the docker auth json together into one file, which flux will then use for auth.
