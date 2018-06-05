@@ -14,3 +14,7 @@ Now your flux pod should be up and running and checking ECR images running insid
 If you see an error message about "--docker-config" then something isn't configured right. Debug by running `kubectl exec -it <pod_name> -c flux /bin/sh` and running `cat /docker-creds/config.json` and inspecting the docker config using `base64` to look for reasons why.
 
 The Dockerfile is provided for convenience but the one already used in the manifest should work fine.
+
+## Limitations
+
+Right now this will only allow you to auth to an ECR registry. You would need to edit the script to accept mounted in secrets and possibly use `jq` to stitch them all together if you wanted flux to auth to multiple different registries at once. This is just a proof of concept.
