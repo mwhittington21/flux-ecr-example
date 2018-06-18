@@ -3,7 +3,29 @@
 ECR_REGION="$1"
 
 
-aws --region ${ECR_REGION} ecr get-login --no-include-email > /tmp/ecr.creds
+write_ecr_creds() {
+  aws --region ${ECR_REGION} ecr get-login --no-include-email > /tmp/ecr.creds
+}
+
+# Fix for AWS creds not being ready at pod startup sometimes
+# Start at the 3rd Fibonacci number
+PREV_FIB_NUM1=0
+PREV_FIB_NUM2=1
+CURRENT_FIB_NUM=1
+get_next_backoff() {
+  # Fibonacci sequence
+  CURRENT_FIB_NUM=$(expr $PREV_FIB_NUM1 + $PREV_FIB_NUM2)
+  PREV_FIB_NUM1=$PREV_FIB_NUM2
+  PREV_FIB_NUM2=$CURRENT_FIB_NUM
+}
+
+write_ecr_creds
+while [ $? -ne 0 ]; do
+  get_next_backoff
+  echo "AWS get creds failed, backing off for ${CURRENT_FIB_NUM}s"
+  sleep $CURRENT_FIB_NUM
+  write_ecr_creds
+done
 
 DOCKER_CREDS_FILE_NAME=config.json
 ECR_USERNAME=AWS
