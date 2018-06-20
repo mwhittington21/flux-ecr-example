@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -eux
+set -x
 
 # Every 8 hours regenerate the docker creds and then kill fluxd so it picks them up
 # Ghetto, but I don't want to do an upstream PR in the middle of this spike.
