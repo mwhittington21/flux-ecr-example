@@ -27,26 +27,16 @@ spec:
       - name: shared-data
         emptyDir: {}
 
-      initContainers:
-      - name: init-ecr-creds
-        image: struz/ecr-creds:v0.2.9
-        imagePullPolicy: IfNotPresent
-        command:
-          - /bin/sh
-          - -c
-          - "make_docker_config_json.sh ap-southeast-2"
-        volumeMounts:
-        - name: shared-data
-          mountPath: /docker-creds
-
       containers:
       - name: flux
         # There are no ":latest" images for flux. Find the most recent
         # release or image version at https://quay.io/weaveworks/flux
         # and replace the tag here.
-        image: quay.io/weaveworks/flux:1.3.1
-        #image: struz/flux:1.3.1-test
+        image: struz/ecr-flux:v0.3.0
         imagePullPolicy: IfNotPresent
+        env:
+        - name: KUBE_ECR_REGION
+          value: ap-southeast-2
         ports:
         - containerPort: 3030 # informational
         volumeMounts:
@@ -80,18 +70,5 @@ spec:
 
         # We specify our own docker creds that are refreshed by the sidecar
         # so that we can pull from ECR, which is otherwise unsupported at flux
-        # version v1.3.1. See: https://github.com/weaveworks/flux/pull/1065
+        # version v1.4.0. See: https://github.com/weaveworks/flux/pull/1065
         - --docker-config=/docker-creds/config.json
-
-      - name: ecr-creds
-        image: struz/ecr-creds:v0.2.9
-        imagePullPolicy: IfNotPresent
-        command:
-          - /bin/sh
-          - -c
-          # Sleep for 8 hours then update the creds, repeat. Far from ideal but
-          # does the job.
-          - "while true; do sleep 28800; make_docker_config_json.sh ap-southeast-2; done"
-        volumeMounts:
-        - name: shared-data
-          mountPath: /docker-creds

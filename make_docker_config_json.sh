@@ -1,10 +1,9 @@
 #!/bin/sh
 
-ECR_REGION="$1"
-
+# KUBE_ECR_REGION must be supplied via Kubernetes manifest 'env' section
 
 write_ecr_creds() {
-  aws --region ${ECR_REGION} ecr get-login --no-include-email > /tmp/ecr.creds
+  aws --region ${KUBE_ECR_REGION} ecr get-login --no-include-email > /tmp/ecr.creds
 }
 
 # Fix for AWS creds not being ready at pod startup sometimes
