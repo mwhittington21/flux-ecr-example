@@ -1,4 +1,6 @@
+# Take Flux as our base image
 FROM quay.io/weaveworks/flux:1.4.1
+# Add aws cli
 RUN /sbin/apk -v --update add \
         jq \
         python \
@@ -11,11 +13,11 @@ RUN /sbin/apk -v --update add \
     /sbin/apk -v --purge del py-pip && \
     rm /var/cache/apk/*
 
+# Add some helper scripts
 COPY make_docker_config_json.sh /usr/local/bin/make_docker_config_json.sh
 COPY run_flux.sh /usr/local/bin/run_flux.sh
 
 VOLUME /root/.aws
 VOLUME /project
 WORKDIR /project
-# us-east-1 is an example default here
 ENTRYPOINT [ "/sbin/tini", "--", "/usr/local/bin/run_flux.sh"]
