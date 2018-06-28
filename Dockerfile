@@ -1,4 +1,4 @@
-FROM quay.io/weaveworks/flux:1.4.0
+FROM quay.io/weaveworks/flux:1.4.1
 RUN /sbin/apk -v --update add \
         jq \
         python \
